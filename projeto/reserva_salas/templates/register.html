@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro - Reserva de Salas{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-form">
+        <h2>Criar Nova Conta</h2>
+        <form method="POST">
+            <label>Nome:</label>
+            <input type="text" name="nome" required placeholder="Seu nome completo">
+            <label>Email:</label>
+            <input type="email" name="email" required placeholder="Seu email">
+            <label>Senha:</label>
+            <input type="password" name="senha" required placeholder="Crie uma senha">
+            <button type="submit">Cadastrar</button>
+        </form>
+        <p>Já tem conta? <a href="/login">Entrar</a></p>
+    </div>
+</div>
+{% endblock %} 
