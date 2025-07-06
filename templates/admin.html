@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Painel de Administração{% endblock %}
+
+{% block content %}
+<div class="navbar" style="margin-bottom: 30px;">
+    <div class="navbar-right">
+        <a href="{{ url_for('index') }}">Início</a>
+        <a href="{{ url_for('logout') }}">Sair</a>
+    </div>
+</div>
+<div class="container">
+    <h2>Painel de Administração</h2>
+    
+    <div class="admin-section">
+        <div class="section-header">
+            <h3>Usuários Cadastrados</h3>
+            <a href="{{ url_for('novo_usuario') }}" class="btn-primary">+ Adicionar Usuário</a>
+        </div>
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Admin</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id }}</td>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>
+                            {% if usuario.is_admin %}
+                            <span class="status-admin">Sim</span>
+                            {% else %}
+                            <span class="status-user">Não</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('editar_usuario', user_id=usuario.id) }}" class="btn-editar">Editar</a>
+                                <a href="{{ url_for('excluir_usuario', user_id=usuario.id) }}" 
+                                   class="btn-excluir"
+                                   onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h3>Nova Reserva</h3>
+        <form method="POST" action="{{ url_for('admin_nova_reserva') }}">
+            <label>Professor:</label>
+            <select name="professor_id" required>
+                {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}">{{ usuario.nome }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Data:</label>
+            <input type="date" name="data" min="{{ data_atual.strftime('%Y-%m-%d') }}" required>
+
+            <label>Sala:</label>
+            <select name="sala_id" required>
+                {% for sala in salas %}
+                <option value="{{ sala.id }}">{{ sala.nome }} ({{ sala.capacidade }} lugares)</option>
+                {% endfor %}
+            </select>
+
+            <label>Horário de início:</label>
+            <select name="horario_inicio" required>
+                {% for h, periodo in horarios_permitidos %}
+                <option value="{{h}}">{{h}} ({{periodo}})</option>
+                {% endfor %}
+            </select>
+
+            <label>Horário de fim:</label>
+            <select name="horario_fim" required>
+                {% for h, periodo in horarios_fim %}
+                {% if h == '17:00' %}
+                <option value="{{h}}">{{h}} ({{periodo}}) - Fim do dia</option>
+                {% else %}
+                <option value="{{h}}">{{h}} ({{periodo}})</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+
+            <button type="submit">Criar Reserva</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h3>Todas as Reservas</h3>
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Sala</th>
+                        <th>Horário</th>
+                        <th>Professor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in todas_reservas %}
+                    <tr>
+                        <td>{{ reserva.id }}</td>
+                        <td>{{ reserva.data.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ reserva.sala.nome }}</td>
+                        <td>{{ reserva.horario_inicio.strftime('%H:%M') }} - {{ reserva.horario_fim.strftime('%H:%M') }}</td>
+                        <td>{{ reserva.professor.nome }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('editar_reserva', reserva_id=reserva.id) }}" class="btn-editar">Editar</a>
+                                <a href="{{ url_for('excluir_reserva', reserva_id=reserva.id) }}" 
+                                   class="btn-excluir"
+                                   onclick="return confirm('Tem certeza que deseja excluir esta reserva?')">Excluir</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h3>Cadastrar Nova Sala</h3>
+        <form method="POST" action="{{ url_for('admin_nova_sala') }}">
+            <label>Nome da Sala:</label>
+            <input type="text" name="nome" required>
+            <label>Capacidade:</label>
+            <input type="number" name="capacidade" min="1" required>
+            <button type="submit">Cadastrar Sala</button>
+        </form>
+    </div>
+
+    <div class="admin-section">
+        <h3>Salas Cadastradas</h3>
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Capacidade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sala in salas %}
+                    <tr>
+                        <td>{{ sala.id }}</td>
+                        <td>{{ sala.nome }}</td>
+                        <td>{{ sala.capacidade }}</td>
+                        <td>
+                            <a href="{{ url_for('excluir_sala', sala_id=sala.id) }}" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir esta sala?')">Excluir</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

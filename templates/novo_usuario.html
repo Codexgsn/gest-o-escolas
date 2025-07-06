@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Usuário{% endblock %}
+
+{% set hide_login_button = True %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-form card-novo-usuario">
+        <h2>Adicionar Novo Usuário</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 18px;">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="is_admin"> É administrador
+                </label>
+            </div>
+            <div class="form-actions" style="display: flex; gap: 12px; justify-content: center;">
+                <button type="submit" class="btn-primary">Criar Usuário</button>
+                <a href="{{ url_for('admin') }}" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

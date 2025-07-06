@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Reserva{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Editar Reserva</h2>
+    
+    <form method="POST" class="edit-form">
+        <div class="form-group">
+            <label for="professor_id">Professor:</label>
+            <select id="professor_id" name="professor_id" required>
+                {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}" {% if usuario.id == reserva.professor_id %}selected{% endif %}>
+                    {{ usuario.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="data">Data:</label>
+            <input type="date" id="data" name="data" value="{{ reserva.data.strftime('%Y-%m-%d') }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sala_id">Sala:</label>
+            <select id="sala_id" name="sala_id" required>
+                {% for sala in salas %}
+                <option value="{{ sala.id }}" {% if sala.id == reserva.sala_id %}selected{% endif %}>
+                    {{ sala.nome }} ({{ sala.capacidade }} lugares)
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="horario_inicio">Horário de início:</label>
+            <select id="horario_inicio" name="horario_inicio" required>
+                {% for h, periodo in horarios_permitidos %}
+                <option value="{{h}}" {% if h == reserva.horario_inicio.strftime('%H:%M') %}selected{% endif %}>
+                    {{h}} ({{periodo}})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="horario_fim">Horário de fim:</label>
+            <select id="horario_fim" name="horario_fim" required>
+                {% for h, periodo in horarios_fim %}
+                <option value="{{h}}" {% if h == reserva.horario_fim.strftime('%H:%M') %}selected{% endif %}>
+                    {% if h == '17:00' %}
+                    {{h}} ({{periodo}}) - Fim do dia
+                    {% else %}
+                    {{h}} ({{periodo}})
+                    {% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-salvar">Salvar Alterações</button>
+            <a href="{{ url_for('admin') }}" class="btn-cancelar">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 
