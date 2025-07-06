@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% set hide_login_button = True %}
+
+{% block title %}Reservas de Salas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Reservar Sala</h2>
+    <form method="POST">
+        <label>Data:</label>
+        <input type="date" name="data" min="{{ data_atual.strftime('%Y-%m-%d') }}" required><br>
+        <label>Sala:</label>
+        <select name="sala_id">
+            {% for sala in salas %}
+            <option value="{{ sala.id }}">{{ sala.nome }} ({{ sala.capacidade }} lugares)</option>
+            {% endfor %}
+        </select><br>
+        <label>Horário de início:</label>
+        <select name="horario_inicio" required>
+            {% for h, periodo in horarios_permitidos %}
+                <option value="{{h}}">{{h}} ({{periodo}})</option>
+            {% endfor %}
+        </select><br>
+        <label>Horário de fim:</label>
+        <select name="horario_fim" required>
+            {% for h, periodo in horarios_fim %}
+                {% if h == '17:00' %}
+                    <option value="{{h}}">{{h}} ({{periodo}}) - Fim do dia</option>
+                {% else %}
+                    <option value="{{h}}">{{h}} ({{periodo}})</option>
+                {% endif %}
+            {% endfor %}
+        </select><br>
+        <button type="submit">Reservar</button>
+    </form>
+
+    <h2 style="margin-top: 40px;">Reservas Ativas</h2>
+    <div style="text-align: right; margin-bottom: 16px;">
+        <a href="{{ url_for('todas_reservas') }}" class="btn-primary" style="display: inline-block; min-width: 180px; text-align: center;">Ver Todas as Reservas</a>
+    </div>
+    <div class="tabela-reservas-wrapper">
+        <table class="tabela-reservas">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Sala</th>
+                    <th>Horário</th>
+                    <th>Professor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                <tr class="linha-animada {% if reserva.professor_id == current_user.id %}minha-reserva{% endif %}">
+                    <td>{{ reserva.data.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ reserva.sala.nome }}</td>
+                    <td>{{ reserva.horario_inicio.strftime('%H:%M') }} - {{ reserva.horario_fim.strftime('%H:%M') }}</td>
+                    <td>{{ reserva.professor.nome }}</td>
+                    <td>
+                        {% if reserva.data == data_atual %}
+                            {% if reserva.horario_inicio <= hora_atual and reserva.horario_fim > hora_atual %}
+                                <span class="status-em-andamento">Em andamento</span>
+                            {% elif reserva.horario_inicio > hora_atual %}
+                                <span class="status-agendada">Agendada</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="status-agendada">Agendada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reserva.professor_id == current_user.id %}
+                            <a href="{{ url_for('cancelar_reserva', reserva_id=reserva.id) }}" 
+                               class="cancelar-btn" 
+                               onclick="return confirm('Tem certeza que deseja cancelar esta reserva?')">
+                                Cancelar
+                            </a>
+                        {% else %}
+                            <span class="acao-nao-disponivel">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

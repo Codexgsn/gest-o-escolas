@@ -1,0 +1,79 @@
+========================================
+    SISTEMA DE RESERVA DE SALAS
+    INSTRUÇÕES PARA USAR OS ARQUIVOS .BAT
+========================================
+
+ARQUIVOS DISPONÍVEIS:
+=====================
+
+1. start_server.bat - Inicia o servidor Flask
+2. stop_server.bat - Para o servidor Flask
+3. gerenciar_servidor.bat - Menu completo para gerenciar o servidor
+
+COMO USAR:
+==========
+
+OPÇÃO 1 - Gerenciador Completo (RECOMENDADO):
+---------------------------------------------
+1. Dê duplo clique em "gerenciar_servidor.bat"
+2. Escolha a opção desejada no menu:
+   - [1] Iniciar servidor
+   - [2] Parar servidor
+   - [3] Verificar status
+   - [4] Instalar dependências
+   - [5] Sair
+
+OPÇÃO 2 - Comandos Individuais:
+-------------------------------
+1. Para iniciar: Dê duplo clique em "start_server.bat"
+2. Para parar: Dê duplo clique em "stop_server.bat"
+
+OPÇÃO 3 - Linha de Comando:
+---------------------------
+1. Abra o prompt de comando na pasta do projeto
+2. Execute: start_server.bat (para iniciar)
+3. Execute: stop_server.bat (para parar)
+
+CARACTERÍSTICAS DOS NOVOS ARQUIVOS:
+===================================
+
+✅ Verificação automática do Python
+✅ Instalação automática de dependências
+✅ Limpeza de arquivos PID obsoletos
+✅ Detecção inteligente de processos
+✅ Interface amigável com menus
+✅ Mensagens informativas detalhadas
+✅ Tratamento de erros robusto
+
+ACESSO AO SISTEMA:
+==================
+- URL: http://localhost:5000
+- Login padrão do administrador:
+  * Email: admin@gmail.com
+  * Senha: @dm1n
+
+SOLUÇÃO DE PROBLEMAS:
+====================
+
+Se o servidor não iniciar:
+1. Verifique se o Python está instalado
+2. Execute "gerenciar_servidor.bat" e escolha opção 4
+3. Tente iniciar novamente
+
+Se o servidor não parar:
+1. Use Ctrl+C no terminal onde está rodando
+2. Ou execute "stop_server.bat" várias vezes
+
+Se houver erro de porta em uso:
+1. Execute "stop_server.bat"
+2. Aguarde alguns segundos
+3. Execute "start_server.bat"
+
+NOTAS IMPORTANTES:
+=================
+- Sempre use o gerenciador para operações seguras
+- O servidor roda na porta 5000 por padrão
+- Os arquivos .bat funcionam apenas no Windows
+- Para Linux/Mac, use os comandos Python diretamente
+
+======================================== 

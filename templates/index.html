@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Reserva de Salas - Sistema de Gestão{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" alt="Escola" class="hero-icon">
+        <h1>Sistema de Gestão de Reservas Escolares</h1>
+        <p class="hero-subtitle">Gerencie suas salas de aula de forma eficiente e organizada</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" alt="Calendário" class="feature-icon">
+            <h3>Reservas Inteligentes</h3>
+            <p>Agende suas aulas com facilidade, evitando conflitos de horários e otimizando o uso dos espaços.</p>
+        </div>
+
+        <div class="feature-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" alt="Organização" class="feature-icon">
+            <h3>Gestão Eficiente</h3>
+            <p>Controle total sobre as reservas de salas, equipamentos e recursos didáticos da escola.</p>
+        </div>
+
+        <div class="feature-card">
+            <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" alt="Comunicação" class="feature-icon">
+            <h3>Comunicação Integrada</h3>
+            <p>Mantenha todos informados sobre as reservas e disponibilidade dos espaços escolares.</p>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2>Por que usar nosso sistema?</h2>
+        <div class="benefits-list">
+            <div class="benefit-item">
+                <span class="benefit-icon">📅</span>
+                <div class="benefit-text">
+                    <h4>Agendamento Simplificado</h4>
+                    <p>Reserve salas com poucos cliques, visualizando disponibilidade em tempo real.</p>
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <span class="benefit-icon">🔍</span>
+                <div class="benefit-text">
+                    <h4>Transparência Total</h4>
+                    <p>Acompanhe todas as reservas da escola e evite conflitos de horários.</p>
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <span class="benefit-icon">📱</span>
+                <div class="benefit-text">
+                    <h4>Acesso em Qualquer Lugar</h4>
+                    <p>Sistema responsivo que funciona em qualquer dispositivo.</p>
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <span class="benefit-icon">📊</span>
+                <div class="benefit-text">
+                    <h4>Gestão de Recursos</h4>
+                    <p>Controle eficiente de salas, equipamentos e materiais didáticos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>Comece a Organizar Sua Escola Hoje!</h2>
+        <p>Junte-se a outras instituições que já utilizam nosso sistema para uma gestão mais eficiente.</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('login') }}" class="cta-button secondary">Fazer Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
