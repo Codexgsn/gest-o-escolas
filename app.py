@@ -7,6 +7,7 @@ import re
 from functools import wraps
 from werkzeug.security import generate_password_hash
 
+
 # Constantes globais para horários
 HORARIOS_PERMITIDOS = [
     ("07:30", "manhã"),
