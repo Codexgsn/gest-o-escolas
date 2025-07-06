@@ -1,0 +1,62 @@
+========================================
+    SISTEMA DE RESERVA DE SALAS
+    COM PAINEL DE ADMINISTRAÇÃO
+========================================
+
+🚀 COMO USAR:
+
+1. DÊ DUPLO CLIQUE NO ARQUIVO: setup_admin.bat
+   (Isso vai instalar as dependências e iniciar o sistema)
+
+2. AGUARDE o sistema iniciar e aparecer a mensagem:
+   "✅ Administrador padrão criado automaticamente!"
+
+3. ABRA SEU NAVEGADOR e acesse:
+   http://localhost:5000
+
+4. FAÇA LOGIN com as credenciais:
+   Email: admin@gmail.com
+   Senha: @dm1n
+
+5. VOCÊ SERÁ REDIRECIONADO automaticamente para o painel de administração!
+
+========================================
+    FUNCIONALIDADES DO ADMIN:
+========================================
+
+✅ GERENCIAR USUÁRIOS:
+   - Ver todos os usuários cadastrados
+   - Criar novos usuários
+   - Editar informações dos usuários
+   - Excluir usuários
+   - Tornar qualquer usuário administrador
+
+✅ GERENCIAR RESERVAS:
+   - Ver todas as reservas do sistema
+   - Criar reservas para qualquer usuário
+   - Editar reservas existentes
+   - Excluir reservas de qualquer usuário
+
+✅ FUNCIONALIDADES ESPECIAIS:
+   - Acesso exclusivo (só admins)
+   - Redirecionamento automático para o painel
+   - Interface moderna e intuitiva
+   - Confirmações de segurança
+
+========================================
+    SE DER PROBLEMA:
+========================================
+
+1. Verifique se o Python está instalado
+2. Execute manualmente: python app.py
+3. Se der erro de dependências, execute:
+   pip install Flask Flask-Login Flask-SQLAlchemy
+
+========================================
+    CREDENCIAIS DO ADMIN:
+========================================
+
+Email: admin@gmail.com
+Senha: @dm1n
+
+O usuário admin é criado automaticamente na primeira execução! 
