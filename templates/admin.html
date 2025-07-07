@@ -69,7 +69,7 @@
             <label>Data:</label>
             <input type="date" name="data" min="{{ data_atual.strftime('%Y-%m-%d') }}" required>
 
-            <label>Sala:</label>
+            <label>Sala ou Objeto:</label>
             <select name="sala_id" required>
                 {% for sala in salas %}
                 <option value="{{ sala.id }}">{{ sala.nome }} ({{ sala.capacidade }} lugares)</option>
@@ -106,7 +106,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Data</th>
-                        <th>Sala</th>
+                        <th>Salas ou Objetos</th>
                         <th>Horário</th>
                         <th>Professor</th>
                         <th>Ações</th>
@@ -136,18 +136,18 @@
     </div>
 
     <div class="admin-section">
-        <h3>Cadastrar Nova Sala</h3>
+        <h3>Cadastrar Nova Sala ou Objeto</h3>
         <form method="POST" action="{{ url_for('admin_nova_sala') }}">
-            <label>Nome da Sala:</label>
+            <label>Nome da Sala ou Objeto:</label>
             <input type="text" name="nome" required>
             <label>Capacidade:</label>
             <input type="number" name="capacidade" min="1" required>
-            <button type="submit">Cadastrar Sala</button>
+            <button type="submit">Cadastrar Sala ou Objeto</button>
         </form>
     </div>
 
     <div class="admin-section">
-        <h3>Salas Cadastradas</h3>
+        <h3>Salas e Objetos Cadastrados</h3>
         <div class="table-wrapper">
             <table class="admin-table">
                 <thead>

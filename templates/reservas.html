@@ -2,11 +2,11 @@
 
 {% set hide_login_button = True %}
 
-{% block title %}Reservas de Salas{% endblock %}
+{% block title %}Reservas de Salas e Objetos{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Reservar Sala</h2>
+    <h2>Reservar Sala ou Objeto</h2>
     <form method="POST">
         <label>Data:</label>
         <input type="date" name="data" min="{{ data_atual.strftime('%Y-%m-%d') }}" required><br>
