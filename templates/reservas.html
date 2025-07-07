@@ -10,7 +10,7 @@
     <form method="POST">
         <label>Data:</label>
         <input type="date" name="data" min="{{ data_atual.strftime('%Y-%m-%d') }}" required><br>
-        <label>Sala:</label>
+        <label>Sala ou Objeto:</label>
         <select name="sala_id">
             {% for sala in salas %}
             <option value="{{ sala.id }}">{{ sala.nome }} ({{ sala.capacidade }} lugares)</option>
@@ -44,7 +44,7 @@
             <thead>
                 <tr>
                     <th>Data</th>
-                    <th>Sala</th>
+                    <th>Sala ou Objetos</th>
                     <th>Horário</th>
                     <th>Professor</th>
                     <th>Status</th>
