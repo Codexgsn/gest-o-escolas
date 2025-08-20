@@ -190,109 +190,206 @@ let periodoChart, ultimos7DiasChart, mensalChart;
 // Função para atualizar o dashboard em tempo real
 function atualizarDashboard() {
     fetch('/dashboard/atualizar')
-        .then(response => response.json())
-        .then(data => {
-            // Atualizar estatísticas principais
-            document.getElementById('total-salas').textContent = data.total_salas;
-            document.getElementById('total-usuarios').textContent = data.total_usuarios;
-            document.getElementById('total-reservas').textContent = data.total_reservas;
-            document.getElementById('reservas-hoje').textContent = data.reservas_hoje;
-            
-            // Atualizar gráfico de período
-            if (periodoChart) {
-                periodoChart.data.datasets[0].data = [data.reservas_manha, data.reservas_tarde];
-                periodoChart.update();
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
-            // Atualizar gráfico de linha (7 dias)
-            if (ultimos7DiasChart) {
-                const labels = data.reservas_ultimos_7_dias.map(r => r.data);
-                const values = data.reservas_ultimos_7_dias.map(r => r.total);
-                ultimos7DiasChart.data.labels = labels;
-                ultimos7DiasChart.data.datasets[0].data = values;
-                ultimos7DiasChart.update();
-            }
-            
-            // Atualizar gráfico mensal
-            if (mensalChart) {
-                const labels = data.reservas_por_mes.map(r => r.mes);
-                const values = data.reservas_por_mes.map(r => r.total);
-                mensalChart.data.labels = labels;
-                mensalChart.data.datasets[0].data = values;
-                mensalChart.update();
-            }
-            
-            // Atualizar tabelas de ranking
-            atualizarTabelaRanking('salas-ranking', data.salas_mais_reservadas, 'nome', 'total');
-            atualizarTabelaRanking('professores-ranking', data.professores_mais_reservam, 'nome', 'total');
-            
-            // Atualizar salas disponíveis
-            atualizarSalasDisponiveis(data.salas_disponiveis_hoje);
-            
-            // Atualizar top salas hoje
-            atualizarTopSalasHoje(data.top_salas_hoje);
+            return response.json();
         })
-        .catch(error => console.error('Erro ao atualizar dashboard:', error));
+        .then(data => {
+            try {
+                // Verificar se os dados estão completos
+                if (!data || typeof data !== 'object') {
+                    console.error('Dados inválidos recebidos:', data);
+                    return;
+                }
+                
+                // Atualizar estatísticas principais
+                if (document.getElementById('total-salas')) {
+                    document.getElementById('total-salas').textContent = data.total_salas || 0;
+                }
+                if (document.getElementById('total-usuarios')) {
+                    document.getElementById('total-usuarios').textContent = data.total_usuarios || 0;
+                }
+                if (document.getElementById('total-reservas')) {
+                    document.getElementById('total-reservas').textContent = data.total_reservas || 0;
+                }
+                if (document.getElementById('reservas-hoje')) {
+                    document.getElementById('reservas-hoje').textContent = data.reservas_hoje || 0;
+                }
+                
+                // Atualizar gráfico de período
+                if (periodoChart && data.reservas_manha !== undefined && data.reservas_tarde !== undefined) {
+                    periodoChart.data.datasets[0].data = [data.reservas_manha || 0, data.reservas_tarde || 0];
+                    periodoChart.update();
+                }
+                
+                // Atualizar gráfico de linha (7 dias)
+                if (ultimos7DiasChart && Array.isArray(data.reservas_ultimos_7_dias)) {
+                    const labels = data.reservas_ultimos_7_dias.map(r => r.data || '');
+                    const values = data.reservas_ultimos_7_dias.map(r => r.total || 0);
+                    ultimos7DiasChart.data.labels = labels;
+                    ultimos7DiasChart.data.datasets[0].data = values;
+                    ultimos7DiasChart.update();
+                }
+                
+                // Atualizar gráfico mensal
+                if (mensalChart && Array.isArray(data.reservas_por_mes)) {
+                    const labels = data.reservas_por_mes.map(r => r.mes || '');
+                    const values = data.reservas_por_mes.map(r => r.total || 0);
+                    mensalChart.data.labels = labels;
+                    mensalChart.data.datasets[0].data = values;
+                    mensalChart.update();
+                }
+                
+                // Atualizar tabelas de ranking
+                if (Array.isArray(data.salas_mais_reservadas)) {
+                    atualizarTabelaRanking('salas-ranking', data.salas_mais_reservadas, 'nome', 'total');
+                }
+                if (Array.isArray(data.professores_mais_reservam)) {
+                    atualizarTabelaRanking('professores-ranking', data.professores_mais_reservam, 'nome', 'total');
+                }
+                
+                // Atualizar salas disponíveis
+                if (Array.isArray(data.salas_disponiveis_hoje)) {
+                    atualizarSalasDisponiveis(data.salas_disponiveis_hoje);
+                }
+                
+                // Atualizar top salas hoje
+                if (Array.isArray(data.top_salas_hoje)) {
+                    atualizarTopSalasHoje(data.top_salas_hoje);
+                }
+            } catch (error) {
+                console.error('Erro ao processar dados do dashboard:', error);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar dashboard:', error);
+            // Tentar novamente em 5 segundos em caso de erro
+            setTimeout(atualizarDashboard, 5000);
+        });
 }
 
 // Função para atualizar tabelas de ranking
 function atualizarTabelaRanking(tableId, data, nomeField, totalField) {
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    if (!tbody) return;
-    
-    tbody.innerHTML = '';
-    data.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        const position = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
+    try {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        if (!tbody) {
+            console.warn(`Tbody não encontrado para tabela: ${tableId}`);
+            return;
+        }
         
-        tr.innerHTML = `
-            <td class="position">${position}</td>
-            <td>${item[nomeField]}</td>
-            <td class="total">${item[totalField]}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+        if (!Array.isArray(data)) {
+            console.warn(`Dados inválidos para tabela ${tableId}:`, data);
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        data.forEach((item, index) => {
+            if (!item || typeof item !== 'object') {
+                console.warn(`Item inválido na posição ${index}:`, item);
+                return;
+            }
+            
+            const tr = document.createElement('tr');
+            const position = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
+            const nome = item[nomeField] || 'N/A';
+            const total = item[totalField] || 0;
+            
+            tr.innerHTML = `
+                <td class="position">${position}</td>
+                <td>${nome}</td>
+                <td class="total">${total}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error(`Erro ao atualizar tabela ${tableId}:`, error);
+    }
 }
 
 // Função para atualizar salas disponíveis
 function atualizarSalasDisponiveis(salas) {
-    const container = document.querySelector('.available-rooms');
-    if (!container) return;
-    
-    if (salas.length === 0) {
-        container.innerHTML = '<div class="no-availability">Nenhuma sala disponível hoje</div>';
-    } else {
-        container.innerHTML = salas.map(sala => `
-            <div class="room-badge">
-                <div class="room-name">${sala.nome}</div>
-                <div class="room-capacity">${sala.capacidade} lugares</div>
-            </div>
-        `).join('');
+    try {
+        const container = document.querySelector('.available-rooms');
+        if (!container) {
+            console.warn('Container de salas disponíveis não encontrado');
+            return;
+        }
+        
+        if (!Array.isArray(salas)) {
+            console.warn('Dados de salas disponíveis inválidos:', salas);
+            return;
+        }
+        
+        if (salas.length === 0) {
+            container.innerHTML = '<div class="no-availability">Nenhuma sala disponível hoje</div>';
+        } else {
+            container.innerHTML = salas.map(sala => {
+                if (!sala || typeof sala !== 'object') {
+                    console.warn('Sala inválida:', sala);
+                    return '';
+                }
+                return `
+                    <div class="room-badge">
+                        <div class="room-name">${sala.nome || 'N/A'}</div>
+                        <div class="room-capacity">${sala.capacidade || 0} lugares</div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar salas disponíveis:', error);
     }
 }
 
 // Função para atualizar top salas hoje
 function atualizarTopSalasHoje(salas) {
-    const container = document.querySelector('.today-rooms');
-    if (!container) return;
-    
-    if (salas.length === 0) {
-        container.innerHTML = '<div class="no-availability">Nenhuma sala reservada hoje</div>';
-    } else {
-        container.innerHTML = salas.map(sala => `
-            <div class="today-room">
-                <div class="room-name">${sala.nome}</div>
-                <div class="reservas-count">${sala.reservas_hoje} reserva${sala.reservas_hoje > 1 ? 's' : ''}</div>
-            </div>
-        `).join('');
+    try {
+        const container = document.querySelector('.today-rooms');
+        if (!container) {
+            console.warn('Container de top salas hoje não encontrado');
+            return;
+        }
+        
+        if (!Array.isArray(salas)) {
+            console.warn('Dados de top salas hoje inválidos:', salas);
+            return;
+        }
+        
+        if (salas.length === 0) {
+            container.innerHTML = '<div class="no-availability">Nenhuma sala reservada hoje</div>';
+        } else {
+            container.innerHTML = salas.map(sala => {
+                if (!sala || typeof sala !== 'object') {
+                    console.warn('Sala inválida:', sala);
+                    return '';
+                }
+                const reservas = sala.reservas_hoje || 0;
+                return `
+                    <div class="today-room">
+                        <div class="room-name">${sala.nome || 'N/A'}</div>
+                        <div class="reservas-count">${reservas} reserva${reservas > 1 ? 's' : ''}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar top salas hoje:', error);
     }
 }
 
 // Inicializar gráficos
 document.addEventListener('DOMContentLoaded', function() {
-    // Gráfico de Reservas por Período (Pizza)
-    const periodoCtx = document.getElementById('periodoChart').getContext('2d');
-    periodoChart = new Chart(periodoCtx, {
+    try {
+        // Gráfico de Reservas por Período (Pizza)
+        const periodoCtx = document.getElementById('periodoChart');
+        if (!periodoCtx) {
+            console.warn('Canvas periodoChart não encontrado');
+            return;
+        }
+        
+        periodoChart = new Chart(periodoCtx.getContext('2d'), {
         type: 'doughnut',
         data: {
             labels: ['Manhã', 'Tarde'],
@@ -318,9 +415,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Gráfico de Reservas dos Últimos 7 Dias (Linha)
-    const ultimos7DiasCtx = document.getElementById('ultimos7DiasChart').getContext('2d');
-    ultimos7DiasChart = new Chart(ultimos7DiasCtx, {
+        // Gráfico de Reservas dos Últimos 7 Dias (Linha)
+        const ultimos7DiasCtx = document.getElementById('ultimos7DiasChart');
+        if (!ultimos7DiasCtx) {
+            console.warn('Canvas ultimos7DiasChart não encontrado');
+            return;
+        }
+        
+        ultimos7DiasChart = new Chart(ultimos7DiasCtx.getContext('2d'), {
         type: 'line',
         data: {
             labels: [
@@ -361,9 +463,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Gráfico de Reservas por Mês (Barras)
-    const mensalCtx = document.getElementById('mensalChart').getContext('2d');
-    mensalChart = new Chart(mensalCtx, {
+        // Gráfico de Reservas por Mês (Barras)
+        const mensalCtx = document.getElementById('mensalChart');
+        if (!mensalCtx) {
+            console.warn('Canvas mensalChart não encontrado');
+            return;
+        }
+        
+        mensalChart = new Chart(mensalCtx.getContext('2d'), {
         type: 'bar',
         data: {
             labels: [
@@ -403,25 +510,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Configurar atualização automática a cada 30 segundos
-    setInterval(atualizarDashboard, 30000);
-    
-    // Atualizar também quando a página ganhar foco (usuário retorna à aba)
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            atualizarDashboard();
-        }
-    });
-    
-    // Atualizar quando o usuário fizer scroll para o topo (indicando interesse)
-    let lastScrollTop = 0;
-    window.addEventListener('scroll', function() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        if (scrollTop < lastScrollTop && scrollTop < 100) {
-            atualizarDashboard();
-        }
-        lastScrollTop = scrollTop;
-    });
+        // Configurar atualização automática a cada 30 segundos
+        setInterval(atualizarDashboard, 30000);
+        
+        // Atualizar também quando a página ganhar foco (usuário retorna à aba)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                atualizarDashboard();
+            }
+        });
+        
+        // Atualizar quando o usuário fizer scroll para o topo (indicando interesse)
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop < lastScrollTop && scrollTop < 100) {
+                atualizarDashboard();
+            }
+            lastScrollTop = scrollTop;
+        });
+        
+    } catch (error) {
+        console.error('Erro ao inicializar gráficos do dashboard:', error);
+        // Tentar inicializar novamente em 2 segundos
+        setTimeout(() => {
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+        }, 2000);
+    }
 });
 </script>
 {% endblock %}
