@@ -531,6 +531,191 @@ def excluir_sala(sala_id):
     flash('Sala excluída com sucesso!', 'success')
     return redirect(url_for('admin'))
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """Dashboard com informações gerais sobre reservas, salas e usuários."""
+    from datetime import datetime, date, timedelta
+    from sqlalchemy import func, desc
+    
+    # Data atual
+    hoje = date.today()
+    
+    # Estatísticas gerais
+    total_salas = Sala.query.count()
+    total_usuarios = Usuario.query.count()
+    total_reservas = Reserva.query.count()
+    reservas_hoje = Reserva.query.filter(Reserva.data == hoje).count()
+    
+    # Salas mais reservadas
+    salas_mais_reservadas = db.session.query(
+        Sala.nome,
+        func.count(Reserva.id).label('total_reservas')
+    ).join(Reserva).group_by(Sala.id).order_by(desc('total_reservas')).limit(5).all()
+    
+    # Professores que mais reservam
+    professores_mais_reservam = db.session.query(
+        Usuario.nome,
+        func.count(Reserva.id).label('total_reservas')
+    ).join(Reserva).group_by(Usuario.id).order_by(desc('total_reservas')).limit(5).all()
+    
+    # Reservas por período (manhã/tarde)
+    reservas_manha = Reserva.query.filter(
+        Reserva.horario_inicio < time(12, 0)
+    ).count()
+    
+    reservas_tarde = Reserva.query.filter(
+        Reserva.horario_inicio >= time(12, 0)
+    ).count()
+    
+    # Reservas dos últimos 7 dias
+    data_7_dias_atras = hoje - timedelta(days=7)
+    reservas_ultimos_7_dias = db.session.query(
+        func.date(Reserva.data).label('data'),
+        func.count(Reserva.id).label('total')
+    ).filter(
+        Reserva.data >= data_7_dias_atras
+    ).group_by(func.date(Reserva.data)).order_by('data').all()
+    
+    # Salas disponíveis hoje (não reservadas)
+    salas_disponiveis_hoje = []
+    todas_salas = Sala.query.all()
+    
+    for sala in todas_salas:
+        reservas_sala_hoje = Reserva.query.filter(
+            Reserva.sala_id == sala.id,
+            Reserva.data == hoje
+        ).count()
+        
+        if reservas_sala_hoje == 0:
+            salas_disponiveis_hoje.append(sala)
+    
+    # Reservas por mês (últimos 6 meses)
+    data_6_meses_atras = hoje - timedelta(days=180)
+    reservas_por_mes = db.session.query(
+        func.strftime('%Y-%m', Reserva.data).label('mes'),
+        func.count(Reserva.id).label('total')
+    ).filter(
+        Reserva.data >= data_6_meses_atras
+    ).group_by(func.strftime('%Y-%m', Reserva.data)).order_by('mes').all()
+    
+    # Top 5 salas com mais reservas hoje
+    top_salas_hoje = db.session.query(
+        Sala.nome,
+        func.count(Reserva.id).label('reservas_hoje')
+    ).join(Reserva).filter(
+        Reserva.data == hoje
+    ).group_by(Sala.id).order_by(desc('reservas_hoje')).limit(5).all()
+    
+    return render_template('dashboard.html',
+                         total_salas=total_salas,
+                         total_usuarios=total_usuarios,
+                         total_reservas=total_reservas,
+                         reservas_hoje=reservas_hoje,
+                         salas_mais_reservadas=salas_mais_reservadas,
+                         professores_mais_reservam=professores_mais_reservam,
+                         reservas_manha=reservas_manha,
+                         reservas_tarde=reservas_tarde,
+                         reservas_ultimos_7_dias=reservas_ultimos_7_dias,
+                         salas_disponiveis_hoje=salas_disponiveis_hoje,
+                         reservas_por_mes=reservas_por_mes,
+                         top_salas_hoje=top_salas_hoje,
+                         hoje=hoje)
+
+
+@app.route('/dashboard/atualizar')
+@login_required
+def dashboard_atualizar():
+    """Endpoint para atualização em tempo real do dashboard."""
+    from datetime import datetime, date, timedelta
+    from sqlalchemy import func, desc
+    
+    # Data atual
+    hoje = date.today()
+    
+    # Estatísticas gerais
+    total_salas = Sala.query.count()
+    total_usuarios = Usuario.query.count()
+    total_reservas = Reserva.query.count()
+    reservas_hoje = Reserva.query.filter(Reserva.data == hoje).count()
+    
+    # Salas mais reservadas
+    salas_mais_reservadas = db.session.query(
+        Sala.nome,
+        func.count(Reserva.id).label('total_reservas')
+    ).join(Reserva).group_by(Sala.id).order_by(desc('total_reservas')).limit(5).all()
+    
+    # Professores que mais reservam
+    professores_mais_reservam = db.session.query(
+        Usuario.nome,
+        func.count(Reserva.id).label('total_reservas')
+    ).join(Reserva).group_by(Usuario.id).order_by(desc('total_reservas')).limit(5).all()
+    
+    # Reservas por período (manhã/tarde)
+    reservas_manha = Reserva.query.filter(
+        Reserva.horario_inicio < time(12, 0)
+    ).count()
+    
+    reservas_tarde = Reserva.query.filter(
+        Reserva.horario_inicio >= time(12, 0)
+    ).count()
+    
+    # Reservas dos últimos 7 dias
+    data_7_dias_atras = hoje - timedelta(days=7)
+    reservas_ultimos_7_dias = db.session.query(
+        func.date(Reserva.data).label('data'),
+        func.count(Reserva.id).label('total')
+    ).filter(
+        Reserva.data >= data_7_dias_atras
+    ).group_by(func.date(Reserva.data)).order_by('data').all()
+    
+    # Salas disponíveis hoje (não reservadas)
+    salas_disponiveis_hoje = []
+    todas_salas = Sala.query.all()
+    
+    for sala in todas_salas:
+        reservas_sala_hoje = Reserva.query.filter(
+            Reserva.sala_id == sala.id,
+            Reserva.data == hoje
+        ).count()
+        
+        if reservas_sala_hoje == 0:
+            salas_disponiveis_hoje.append(sala)
+    
+    # Reservas por mês (últimos 6 meses)
+    data_6_meses_atras = hoje - timedelta(days=180)
+    reservas_por_mes = db.session.query(
+        func.strftime('%Y-%m', Reserva.data).label('mes'),
+        func.count(Reserva.id).label('total')
+    ).filter(
+        Reserva.data >= data_6_meses_atras
+    ).group_by(func.strftime('%Y-%m', Reserva.data)).order_by('mes').all()
+    
+    # Top 5 salas com mais reservas hoje
+    top_salas_hoje = db.session.query(
+        Sala.nome,
+        func.count(Reserva.id).label('reservas_hoje')
+    ).join(Reserva).filter(
+        Reserva.data == hoje
+    ).group_by(Sala.id).order_by(desc('reservas_hoje')).limit(5).all()
+    
+    # Retorna dados em formato JSON para atualização em tempo real
+    return jsonify({
+        'total_salas': total_salas,
+        'total_usuarios': total_usuarios,
+        'total_reservas': total_reservas,
+        'reservas_hoje': reservas_hoje,
+        'salas_mais_reservadas': [{'nome': s[0], 'total': s[1]} for s in salas_mais_reservadas],
+        'professores_mais_reservam': [{'nome': p[0], 'total': p[1]} for p in professores_mais_reservam],
+        'reservas_manha': reservas_manha,
+        'reservas_tarde': reservas_tarde,
+        'reservas_ultimos_7_dias': [{'data': str(r[0]), 'total': r[1]} for r in reservas_ultimos_7_dias],
+        'salas_disponiveis_hoje': [{'nome': s.nome, 'capacidade': s.capacidade} for s in salas_disponiveis_hoje],
+        'reservas_por_mes': [{'mes': r[0], 'total': r[1]} for r in reservas_por_mes],
+        'top_salas_hoje': [{'nome': s[0], 'reservas_hoje': s[1]} for s in top_salas_hoje],
+        'hoje': str(hoje)
+    })
+
 
 
 def create_default_admin_if_not_exists():

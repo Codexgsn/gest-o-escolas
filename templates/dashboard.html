@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Estatísticas Gerais{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="dashboard-title">
+                <h1>📊 Dashboard de Estatísticas</h1>
+                <p class="dashboard-subtitle">Visão geral completa do sistema de reservas</p>
+            </div>
+            <div class="dashboard-actions">
+                <a href="{{ url_for('admin') if current_user.is_admin else url_for('reservas') }}" class="btn-voltar">
+                    ← Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas Principais -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">🏢</div>
+            <div class="stat-content">
+                <h3 id="total-salas">{{ total_salas }}</h3>
+                <p>Total de Salas</p>
+            </div>
+        </div>
+        
+        <div class="stat-card success">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <h3 id="total-usuarios">{{ total_usuarios }}</h3>
+                <p>Usuários Cadastrados</p>
+            </div>
+        </div>
+        
+        <div class="stat-card info">
+            <div class="stat-icon">📅</div>
+            <div class="stat-content">
+                <h3 id="total-reservas">{{ total_reservas }}</h3>
+                <p>Total de Reservas</p>
+            </div>
+        </div>
+        
+        <div class="stat-card warning">
+            <div class="stat-icon">📋</div>
+            <div class="stat-content">
+                <h3 id="reservas-hoje">{{ reservas_hoje }}</h3>
+                <p>Reservas Hoje</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos e Análises -->
+    <div class="charts-grid">
+        <!-- Gráfico de Reservas por Período -->
+        <div class="chart-card">
+            <h3>📊 Reservas por Período</h3>
+            <div class="chart-container">
+                <canvas id="periodoChart"></canvas>
+            </div>
+            <div class="chart-stats">
+                <div class="chart-stat">
+                    <span class="stat-label">Manhã</span>
+                    <span class="stat-value">{{ reservas_manha }}</span>
+                </div>
+                <div class="chart-stat">
+                    <span class="stat-label">Tarde</span>
+                    <span class="stat-value">{{ reservas_tarde }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Reservas dos Últimos 7 Dias -->
+        <div class="chart-card">
+            <h3>📈 Reservas dos Últimos 7 Dias</h3>
+            <div class="chart-container">
+                <canvas id="ultimos7DiasChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabelas de Rankings -->
+    <div class="rankings-grid">
+        <!-- Top 5 Salas Mais Reservadas -->
+        <div class="ranking-card">
+            <h3>🏆 Top 5 Salas Mais Reservadas</h3>
+                    <div class="ranking-table">
+            <table id="salas-ranking">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Sala</th>
+                        <th>Total de Reservas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sala, total in salas_mais_reservadas %}
+                    <tr>
+                        <td class="position">
+                            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+                        </td>
+                        <td>{{ sala }}</td>
+                        <td class="total">{{ total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+        <!-- Top 5 Professores que Mais Reservam -->
+        <div class="ranking-card">
+            <h3>👨‍🏫 Top 5 Professores que Mais Reservam</h3>
+                    <div class="ranking-table">
+            <table id="professores-ranking">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Professor</th>
+                        <th>Total de Reservas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for professor, total in professores_mais_reservam %}
+                    <tr>
+                        <td class="position">
+                            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+                        </td>
+                        <td>{{ professor }}</td>
+                        <td class="total">{{ total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+
+    <!-- Salas Disponíveis Hoje -->
+    <div class="availability-section">
+        <h3>✅ Salas Disponíveis Hoje ({{ hoje.strftime('%d/%m/%Y') }})</h3>
+        {% if salas_disponiveis_hoje %}
+        <div class="available-rooms">
+            {% for sala in salas_disponiveis_hoje %}
+            <div class="room-badge available">
+                <span class="room-name">{{ sala.nome }}</span>
+                <span class="room-capacity">{{ sala.capacidade }} lugares</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="no-availability">Todas as salas estão reservadas para hoje.</p>
+        {% endif %}
+    </div>
+
+    <!-- Top Salas Reservadas Hoje -->
+    {% if top_salas_hoje %}
+    <div class="today-section">
+        <h3>🔥 Salas Mais Reservadas Hoje</h3>
+        <div class="today-rooms">
+            {% for sala, reservas in top_salas_hoje %}
+            <div class="today-room">
+                <span class="room-name">{{ sala }}</span>
+                <span class="reservas-count">{{ reservas }} reserva{{ 's' if reservas > 1 else '' }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Gráfico de Reservas por Mês -->
+    <div class="monthly-chart-card">
+        <h3>📅 Reservas por Mês (Últimos 6 Meses)</h3>
+        <div class="chart-container">
+            <canvas id="mensalChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Variáveis globais para os gráficos
+let periodoChart, ultimos7DiasChart, mensalChart;
+
+// Função para atualizar o dashboard em tempo real
+function atualizarDashboard() {
+    fetch('/dashboard/atualizar')
+        .then(response => response.json())
+        .then(data => {
+            // Atualizar estatísticas principais
+            document.getElementById('total-salas').textContent = data.total_salas;
+            document.getElementById('total-usuarios').textContent = data.total_usuarios;
+            document.getElementById('total-reservas').textContent = data.total_reservas;
+            document.getElementById('reservas-hoje').textContent = data.reservas_hoje;
+            
+            // Atualizar gráfico de período
+            if (periodoChart) {
+                periodoChart.data.datasets[0].data = [data.reservas_manha, data.reservas_tarde];
+                periodoChart.update();
+            }
+            
+            // Atualizar gráfico de linha (7 dias)
+            if (ultimos7DiasChart) {
+                const labels = data.reservas_ultimos_7_dias.map(r => r.data);
+                const values = data.reservas_ultimos_7_dias.map(r => r.total);
+                ultimos7DiasChart.data.labels = labels;
+                ultimos7DiasChart.data.datasets[0].data = values;
+                ultimos7DiasChart.update();
+            }
+            
+            // Atualizar gráfico mensal
+            if (mensalChart) {
+                const labels = data.reservas_por_mes.map(r => r.mes);
+                const values = data.reservas_por_mes.map(r => r.total);
+                mensalChart.data.labels = labels;
+                mensalChart.data.datasets[0].data = values;
+                mensalChart.update();
+            }
+            
+            // Atualizar tabelas de ranking
+            atualizarTabelaRanking('salas-ranking', data.salas_mais_reservadas, 'nome', 'total');
+            atualizarTabelaRanking('professores-ranking', data.professores_mais_reservam, 'nome', 'total');
+            
+            // Atualizar salas disponíveis
+            atualizarSalasDisponiveis(data.salas_disponiveis_hoje);
+            
+            // Atualizar top salas hoje
+            atualizarTopSalasHoje(data.top_salas_hoje);
+        })
+        .catch(error => console.error('Erro ao atualizar dashboard:', error));
+}
+
+// Função para atualizar tabelas de ranking
+function atualizarTabelaRanking(tableId, data, nomeField, totalField) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    data.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        const position = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1;
+        
+        tr.innerHTML = `
+            <td class="position">${position}</td>
+            <td>${item[nomeField]}</td>
+            <td class="total">${item[totalField]}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Função para atualizar salas disponíveis
+function atualizarSalasDisponiveis(salas) {
+    const container = document.querySelector('.available-rooms');
+    if (!container) return;
+    
+    if (salas.length === 0) {
+        container.innerHTML = '<div class="no-availability">Nenhuma sala disponível hoje</div>';
+    } else {
+        container.innerHTML = salas.map(sala => `
+            <div class="room-badge">
+                <div class="room-name">${sala.nome}</div>
+                <div class="room-capacity">${sala.capacidade} lugares</div>
+            </div>
+        `).join('');
+    }
+}
+
+// Função para atualizar top salas hoje
+function atualizarTopSalasHoje(salas) {
+    const container = document.querySelector('.today-rooms');
+    if (!container) return;
+    
+    if (salas.length === 0) {
+        container.innerHTML = '<div class="no-availability">Nenhuma sala reservada hoje</div>';
+    } else {
+        container.innerHTML = salas.map(sala => `
+            <div class="today-room">
+                <div class="room-name">${sala.nome}</div>
+                <div class="reservas-count">${sala.reservas_hoje} reserva${sala.reservas_hoje > 1 ? 's' : ''}</div>
+            </div>
+        `).join('');
+    }
+}
+
+// Inicializar gráficos
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de Reservas por Período (Pizza)
+    const periodoCtx = document.getElementById('periodoChart').getContext('2d');
+    periodoChart = new Chart(periodoCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Manhã', 'Tarde'],
+            datasets: [{
+                data: [{{ reservas_manha }}, {{ reservas_tarde }}],
+                backgroundColor: ['#3498db', '#e74c3c'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+    
+    // Gráfico de Reservas dos Últimos 7 Dias (Linha)
+    const ultimos7DiasCtx = document.getElementById('ultimos7DiasChart').getContext('2d');
+    ultimos7DiasChart = new Chart(ultimos7DiasCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for data, total in reservas_ultimos_7_dias %}
+                '{{ data.strftime("%d/%m") }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Reservas',
+                data: [
+                    {% for data, total in reservas_ultimos_7_dias %}
+                    {{ total }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Gráfico de Reservas por Mês (Barras)
+    const mensalCtx = document.getElementById('mensalChart').getContext('2d');
+    mensalChart = new Chart(mensalCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for mes, total in reservas_por_mes %}
+                '{{ mes }}'{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Reservas',
+                data: [
+                    {% for mes, total in reservas_por_mes %}
+                    {{ total }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                borderColor: '#3498db',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Configurar atualização automática a cada 30 segundos
+    setInterval(atualizarDashboard, 30000);
+    
+    // Atualizar também quando a página ganhar foco (usuário retorna à aba)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            atualizarDashboard();
+        }
+    });
+    
+    // Atualizar quando o usuário fizer scroll para o topo (indicando interesse)
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop < lastScrollTop && scrollTop < 100) {
+            atualizarDashboard();
+        }
+        lastScrollTop = scrollTop;
+    });
+});
+</script>
+{% endblock %}

@@ -5,6 +5,459 @@
     box-sizing: border-box;
 }
 
+/* Dashboard Styles */
+.dashboard-container {
+    max-width: 1200px !important;
+    padding: 32px 24px !important;
+}
+
+.dashboard-header {
+    margin-bottom: 40px;
+}
+
+.dashboard-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.dashboard-title {
+    flex: 1;
+    text-align: left;
+}
+
+.dashboard-actions {
+    flex-shrink: 0;
+}
+
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-voltar:hover {
+    background: linear-gradient(135deg, #5a6268, #343a40);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-voltar:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(108, 117, 125, 0.3);
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dashboard-subtitle {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+    border-radius: 20px;
+    padding: 32px 24px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color), var(--accent-color-light));
+}
+
+.stat-card.primary {
+    --accent-color: #3498db;
+    --accent-color-light: #6dd5fa;
+}
+
+.stat-card.success {
+    --accent-color: #2ecc71;
+    --accent-color-light: #a8e6cf;
+}
+
+.stat-card.info {
+    --accent-color: #9b59b6;
+    --accent-color-light: #d2b4de;
+}
+
+.stat-card.warning {
+    --accent-color: #f39c12;
+    --accent-color-light: #f7dc6f;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(44, 62, 80, 0.20);
+}
+
+.stat-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+}
+
+.stat-content h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.stat-content p {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+.chart-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 2px solid rgba(52, 152, 219, 0.10);
+}
+
+.chart-card h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+.chart-container {
+    height: 300px;
+    margin-bottom: 20px;
+}
+
+.chart-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.chart-stat {
+    text-align: center;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    flex: 1;
+}
+
+.stat-label {
+    display: block;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Rankings Grid */
+.rankings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+.ranking-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 2px solid rgba(52, 152, 219, 0.10);
+}
+
+.ranking-card h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+.ranking-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ranking-table th {
+    background: #f8fafc;
+    padding: 16px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #2c3e50;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.ranking-table td {
+    padding: 16px 12px;
+    border-bottom: 1px solid #e9ecef;
+    color: #2c3e50;
+}
+
+.ranking-table .position {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.ranking-table .total {
+    text-align: center;
+    font-weight: 600;
+    color: #3498db;
+}
+
+/* Availability Section */
+.availability-section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 2px solid rgba(52, 152, 219, 0.10);
+    margin-bottom: 32px;
+}
+
+.availability-section h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+.available-rooms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.room-badge {
+    background: linear-gradient(135deg, #2ecc71, #a8e6cf);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.3);
+    transition: all 0.3s ease;
+}
+
+.room-badge:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(46, 204, 113, 0.4);
+}
+
+.room-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.room-capacity {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.no-availability {
+    text-align: center;
+    color: #e74c3c;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Today Section */
+.today-section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 2px solid rgba(52, 152, 219, 0.10);
+    margin-bottom: 32px;
+}
+
+.today-section h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+.today-rooms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.today-room {
+    background: linear-gradient(135deg, #e74c3c, #f39c12);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 16px rgba(231, 76, 60, 0.3);
+    transition: all 0.3s ease;
+}
+
+.today-room:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(231, 76, 60, 0.4);
+}
+
+.today-room .room-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.reservas-count {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Monthly Chart */
+.monthly-chart-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+    border: 2px solid rgba(52, 152, 219, 0.10);
+}
+
+.monthly-chart-card h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 20px 16px !important;
+        margin: 20px auto !important;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .charts-grid,
+    .rankings-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    
+    .chart-card,
+    .ranking-card,
+    .availability-section,
+    .today-section,
+    .monthly-chart-card {
+        padding: 24px 20px;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .available-rooms,
+    .today-rooms {
+        justify-content: center;
+    }
+    
+    .room-badge,
+    .today-room {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-card {
+        padding: 24px 20px;
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+    }
+    
+    .stat-content h3 {
+        font-size: 2rem;
+    }
+    
+    .chart-container {
+        height: 200px;
+    }
+}
+
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
@@ -1287,6 +1740,34 @@ body {
   width: 100%;
 }
 
+/* Responsividade para o Dashboard */
+@media (max-width: 768px) {
+  .dashboard-header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .dashboard-title {
+    text-align: center;
+  }
+  
+  .btn-voltar {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 1rem;
+  }
+}
+
 .admin-table {
   min-width: 600px;
   width: 100%;
@@ -1319,20 +1800,4 @@ body {
     }
 }
 
-/* Botão de voltar */
-.btn-voltar {
-  background: linear-gradient(90deg, #b9c6d8, #6dd5fa 80%);
-  color: #2c3e50;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 18px;
-  font-weight: 500;
-  font-size: 1rem;
-  margin-bottom: 18px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.btn-voltar:hover {
-  background: linear-gradient(90deg, #6dd5fa, #2980b9 80%);
-  color: #fff;
-} 
+ 
