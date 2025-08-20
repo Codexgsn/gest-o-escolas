@@ -426,9 +426,9 @@ document.addEventListener('DOMContentLoaded', function() {
         type: 'line',
         data: {
             labels: [
-                {% for data, total in reservas_ultimos_7_dias %}
-                '{{ data.strftime("%d/%m") }}'{% if not loop.last %},{% endif %}
-                {% endfor %}
+                                 {% for data, total in reservas_ultimos_7_dias %}
+                 '{{ data.strftime("%d/%m") if data and data is not string else (data if data else "") }}'{% if not loop.last %},{% endif %}
+                 {% endfor %}
             ],
             datasets: [{
                 label: 'Reservas',
