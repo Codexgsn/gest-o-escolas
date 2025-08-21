@@ -6,6 +6,7 @@ from models import db, Usuario, Sala, Reserva
 import re
 from functools import wraps
 from werkzeug.security import generate_password_hash
+from config import get_config
 
 
 # Constantes globais para horários
@@ -24,11 +25,10 @@ HORARIOS_PERMITIDOS = [
 HORARIOS_FIM = HORARIOS_PERMITIDOS + [("17:00", "tarde")]
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'chave-temporaria-desenvolvimento')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///reserva_salas.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['REMEMBER_COOKIE_DURATION'] = 0  # Não lembrar login
-app.config['SESSION_PERMANENT'] = False     # Sessão expira ao fechar o navegador
+
+# Aplicar configuração baseada no ambiente
+config = get_config()
+app.config.from_object(config)
 
 db.init_app(app)
 login_manager = LoginManager(app)
@@ -741,4 +741,6 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         create_default_admin_if_not_exists()
+    
+    # Para desenvolvimento local
     app.run(debug=True) 

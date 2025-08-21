@@ -1,0 +1,57 @@
+# Bancos de dados
+*.db
+*.sqlite
+*.sqlite3
+instance/
+backups/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Ambientes virtuais
+venv/
+env/
+ENV/
+
+# Arquivos de configuração local
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Scripts de desenvolvimento local
+*.bat
+start_*.py
+stop_*.py
+examine_*.py
+backup_*.py
+migrate_*.py
+test_*.py
+
+# Documentação excessiva (manter apenas README.md)
+GUIA_*.md
+README_*.md
+RESUMO_*.md
+COMO_USAR*.txt

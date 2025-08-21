@@ -1,0 +1,27 @@
+services:
+  # Serviço Web Principal
+  - type: web
+    name: reserva-salas
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: reserva-salas-db
+          property: connectionString
+
+  # Banco de Dados PostgreSQL
+  - type: pserv
+    name: reserva-salas-db
+    env: postgres
+    plan: free
+    ipAllowList: []
+    maxConnections: 5
