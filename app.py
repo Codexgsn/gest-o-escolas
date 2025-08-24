@@ -714,7 +714,7 @@ def dashboard_atualizar():
         'professores_mais_reservam': [{'nome': p[0], 'total': p[1]} for p in professores_mais_reservam],
         'reservas_manha': reservas_manha,
         'reservas_tarde': reservas_tarde,
-        'reservas_ultimos_7_dias': [{'data': r[0].strftime('%d/%m') if r[0] else '', 'total': r[1]} for r in reservas_ultimos_7_dias],
+        'reservas_ultimos_7_dias': [{'data': str(r[0]) if r[0] else '', 'total': r[1]} for r in reservas_ultimos_7_dias],
         'salas_disponiveis_hoje': [{'nome': s.nome, 'capacidade': s.capacidade} for s in salas_disponiveis_hoje],
         'reservas_por_mes': [{'mes': r[0], 'total': r[1]} for r in reservas_por_mes],
         'top_salas_hoje': [{'nome': s[0], 'reservas_hoje': s[1]} for s in top_salas_hoje],
