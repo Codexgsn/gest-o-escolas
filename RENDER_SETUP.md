@@ -1,13 +1,20 @@
 # 🚀 Configuração do Render para Persistência de Dados
 
-## ❌ **Problema Atual:**
-- Dados são perdidos quando o serviço é reiniciado
-- Banco SQLite local não persiste no Render
-- Sistema de arquivos efêmero do Render
+## ✅ **Status Atual:**
+- ✅ Dependências PostgreSQL configuradas (`psycopg[binary]>=3.2.2`)
+- ✅ Configuração do banco forçada para usar dialeto `psycopg`
+- ✅ Scripts de migração criados
+- ✅ Schema PostgreSQL gerado
+- ✅ Dados do SQLite exportados
 
-## ✅ **Solução: Banco PostgreSQL Persistente**
+## ❌ **Problema Anterior (RESOLVIDO):**
+- ~~Dados são perdidos quando o serviço é reiniciado~~
+- ~~Banco SQLite local não persiste no Render~~
+- ~~Sistema de arquivos efêmero do Render~~
 
-### **Passo 1: Criar Banco PostgreSQL no Render**
+## 🎯 **Próximos Passos Necessários:**
+
+### **Passo 1: Criar Banco PostgreSQL no Render** ⚠️ **PENDENTE**
 
 1. **Acesse o Dashboard do Render:**
    - Vá para [dashboard.render.com](https://dashboard.render.com)
@@ -26,7 +33,7 @@
    - Copie a **"External Database URL"**
    - Esta URL será algo como: `postgres://user:password@host:port/database`
 
-### **Passo 2: Configurar o Serviço Web**
+### **Passo 2: Configurar o Serviço Web** ⚠️ **PENDENTE**
 
 1. **No seu serviço web existente:**
    - Vá para a aba **"Environment"**
@@ -41,67 +48,23 @@
    - **Key:** `SECRET_KEY`
    - **Value:** Uma chave secreta forte (ex: `sua-chave-secreta-muito-segura-aqui`)
 
-### **Passo 3: Instalar Dependências PostgreSQL**
+### **Passo 3: Migrar Dados para PostgreSQL** ⚠️ **PENDENTE**
 
-Adicione ao seu `requirements.txt`:
-```
-psycopg2-binary==2.9.9
-```
+1. **Execute o schema no PostgreSQL do Render:**
+   - Use o arquivo `postgres_schema.sql` para criar as tabelas
+   - Copie e cole o conteúdo no console SQL do Render
 
-### **Passo 4: Migrar Dados (Opcional)**
+2. **Migrar os dados existentes:**
+   - Use o arquivo `migration_data.sql` para inserir os dados
+   - Copie e cole o conteúdo no console SQL do Render
 
-Se você quiser migrar os dados existentes do SQLite para PostgreSQL:
-
-1. **Exportar dados do SQLite:**
-   ```bash
-   # No seu ambiente local
-   python -c "
-   from app import app, db
-   from models import Usuario, Sala, Reserva
-   
-   with app.app_context():
-       # Exportar usuários
-       usuarios = Usuario.query.all()
-       for u in usuarios:
-           print(f'INSERT INTO usuario (nome, email, senha, is_admin) VALUES (\"{u.nome}\", \"{u.email}\", \"{u.senha}\", {u.is_admin});')
-       
-       # Exportar salas
-       salas = Sala.query.all()
-       for s in salas:
-           print(f'INSERT INTO sala (nome, capacidade) VALUES (\"{s.nome}\", {s.capacidade});')
-       
-       # Exportar reservas
-       reservas = Reserva.query.all()
-       for r in reservas:
-           print(f'INSERT INTO reserva (professor_id, sala_id, data, horario_inicio, horario_fim, data_criacao) VALUES ({r.professor_id}, {r.sala_id}, \"{r.data}\", \"{r.horario_inicio}\", \"{r.horario_fim}\", \"{r.data_criacao}\");')
-   "
-   ```
-
-2. **Executar os comandos SQL no PostgreSQL do Render**
-
-### **Passo 5: Verificar Configuração**
-
-A configuração já está correta no `config.py`:
-
-```python
-class ProductionConfig(Config):
-    DEBUG = False
-    DATABASE_URL = os.environ.get('DATABASE_URL')
-    
-    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
-        # Render usa postgres:// mas SQLAlchemy espera postgresql://
-        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-    
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'sqlite:///reserva_salas.db'
-```
-
-### **Passo 6: Deploy e Teste**
+### **Passo 4: Deploy e Teste** ⚠️ **PENDENTE**
 
 1. **Faça commit das alterações:**
    ```bash
    git add .
-   git commit -m "Adiciona suporte ao PostgreSQL para Render"
-   git push
+   git commit -m "Fix: Força uso do dialeto psycopg para PostgreSQL no Render"
+   git push origin master
    ```
 
 2. **O Render fará deploy automático**
@@ -112,13 +75,39 @@ class ProductionConfig(Config):
    - Reinicie o serviço manualmente
    - Verifique se a reserva ainda existe
 
-## 🔧 **Alternativa: Sistema de Backup Automático**
+## 📁 **Arquivos Criados para Migração:**
 
-Se preferir manter o SQLite, você pode implementar um sistema de backup:
+### **`postgres_schema.sql`** ✅
+- Schema completo do banco PostgreSQL
+- Tabelas: `usuario`, `sala`, `reserva`
+- Índices para performance
+- Comentários das tabelas
 
-1. **Backup para serviço de armazenamento externo** (AWS S3, Google Cloud Storage)
-2. **Backup para repositório Git** (não recomendado para dados sensíveis)
-3. **Sincronização com banco local** via API
+### **`migration_data.sql`** ✅
+- Dados exportados do SQLite:
+  - **2 usuários** (incluindo admin)
+  - **2 salas** (3 A informática, sala teste)
+  - **4 reservas** existentes
+
+## 🔧 **Configuração Técnica (JÁ FEITA):**
+
+### **`requirements.txt`** ✅
+```
+psycopg[binary]>=3.2.2
+psycopg>=3.2.2
+```
+
+### **`config.py`** ✅
+- Ambiente padrão: `production`
+- Força uso do dialeto `postgresql+psycopg://`
+- Configurações específicas para PostgreSQL
+
+### **`database.py`** ✅
+- Configuração específica para banco PostgreSQL
+- Força uso do dialeto correto
+
+### **`app.py`** ✅
+- Configuração forçada para usar `get_database_url()`
 
 ## 📊 **Vantagens do PostgreSQL:**
 
@@ -141,6 +130,14 @@ Se preferir manter o SQLite, você pode implementar um sistema de backup:
 - **Teste localmente** antes de fazer deploy
 - **Monitore** o uso de recursos no dashboard do Render
 
+## 🎯 **Resumo dos Passos Pendentes:**
+
+1. **Criar banco PostgreSQL no Render**
+2. **Configurar variáveis de ambiente** (`DATABASE_URL`, `FLASK_ENV`, `SECRET_KEY`)
+3. **Executar schema e migrar dados** usando os arquivos SQL
+4. **Fazer deploy** da aplicação
+5. **Testar persistência** dos dados
+
 ---
 
-**Resultado:** Após essa configuração, seus dados permanecerão intactos mesmo quando o serviço for reiniciado! 🎉
+**Resultado:** Após completar esses passos, seus dados permanecerão intactos mesmo quando o serviço for reiniciado! 🎉

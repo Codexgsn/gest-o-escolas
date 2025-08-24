@@ -1,5 +1,5 @@
 -- Schema do banco PostgreSQL para Gestão de Escolas
--- Gerado em: 2025-08-24 00:26:24.881230
+-- Gerado em: 2025-08-24 11:31:34.012561
 
 -- Tabela de usuários
 CREATE TABLE IF NOT EXISTS usuario (
