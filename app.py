@@ -7,6 +7,7 @@ import re
 from functools import wraps
 from werkzeug.security import generate_password_hash
 from config import get_config
+from database_config import get_database_url
 
 # Constantes globais para horários
 HORARIOS_PERMITIDOS = [
@@ -28,6 +29,10 @@ app = Flask(__name__)
 # Aplicar configuração baseada no ambiente
 config = get_config()
 app.config.from_object(config)
+
+# FORÇA a configuração do banco para usar psycopg explicitamente
+app.config['SQLALCHEMY_DATABASE_URI'] = get_database_url()
+print(f"🔧 SQLALCHEMY_DATABASE_URI configurado: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
 # Inicializar banco de dados
 db.init_app(app)

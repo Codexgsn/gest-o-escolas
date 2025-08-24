@@ -15,22 +15,26 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     """Configuração para produção (Render)"""
     DEBUG = False
+    
     # Usa PostgreSQL se disponível, senão SQLite
     DATABASE_URL = os.environ.get('DATABASE_URL')
     
     if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
         # Render usa postgres:// mas SQLAlchemy espera postgresql://
-        # Força o uso do dialeto psycopg (versão 3)
+        # FORÇA o uso do dialeto psycopg (versão 3) explicitamente
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
         print(f"URL do banco configurada: {DATABASE_URL}")
         
-        # Configurações específicas para PostgreSQL
+        # Configurações específicas para PostgreSQL com psycopg
         SQLALCHEMY_ENGINE_OPTIONS = {
             'connect_args': {
                 'connect_timeout': 10,
                 'application_name': 'gest-o-escolas'
             }
         }
+        
+        # FORÇA o uso do driver psycopg
+        SQLALCHEMY_ENGINE_OPTIONS['driver'] = 'psycopg'
     
     SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'sqlite:///reserva_salas.db'
     print(f"SQLALCHEMY_DATABASE_URI final: {SQLALCHEMY_DATABASE_URI}")
