@@ -3,18 +3,20 @@
 Configuração específica para banco de dados PostgreSQL com psycopg
 """
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 def get_database_url():
     """Retorna a URL do banco de dados configurada"""
     DATABASE_URL = os.environ.get('DATABASE_URL')
+    print(f"🔍 DATABASE_URL do ambiente: {DATABASE_URL}")
+    
     if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
         # Render usa postgres:// mas SQLAlchemy espera postgresql://
         # FORÇA o uso do dialeto psycopg (versão 3)
-        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
-        print(f"URL do banco configurada: {DATABASE_URL}")
-        return DATABASE_URL
+        neon_url = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+        print(f"✅ URL do Neon configurada: {neon_url}")
+        return neon_url
+    
+    print(f"⚠️  Usando SQLite (desenvolvimento local)")
     return 'sqlite:///reserva_salas.db'
 
 def create_database_engine():
@@ -22,6 +24,7 @@ def create_database_engine():
     database_url = get_database_url()
     if database_url.startswith('postgresql+psycopg://'):
         # Configurações específicas para PostgreSQL com psycopg
+        from sqlalchemy import create_engine
         engine = create_engine(
             database_url,
             echo=False,  # Set to True for debug
@@ -33,6 +36,7 @@ def create_database_engine():
         print("✅ Engine PostgreSQL criado com sucesso")
     else:
         # SQLite para desenvolvimento
+        from sqlalchemy import create_engine
         engine = create_engine(database_url, echo=False)
         print("✅ Engine SQLite criado com sucesso")
     return engine
@@ -40,6 +44,7 @@ def create_database_engine():
 def get_session_factory():
     """Retorna a factory de sessões do banco"""
     engine = create_database_engine()
+    from sqlalchemy.orm import sessionmaker
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     return SessionLocal
 
