@@ -20,18 +20,30 @@ class ProductionConfig(Config):
     
     if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
         # Render usa postgres:// mas SQLAlchemy espera postgresql://
+        # Força o uso do dialeto psycopg (versão 3)
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+        print(f"URL do banco configurada: {DATABASE_URL}")
+        
+        # Configurações específicas para PostgreSQL
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'connect_args': {
+                'connect_timeout': 10,
+                'application_name': 'gest-o-escolas'
+            }
+        }
     
     SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'sqlite:///reserva_salas.db'
+    print(f"SQLALCHEMY_DATABASE_URI final: {SQLALCHEMY_DATABASE_URI}")
 
 # Configuração padrão baseada no ambiente
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
-    'default': DevelopmentConfig
+    'default': ProductionConfig  # Mudei para production por padrão
 }
 
 def get_config():
     """Retorna a configuração baseada no ambiente"""
     env = os.environ.get('FLASK_ENV', 'production')  # Mudei para production por padrão
+    print(f"Ambiente configurado: {env}")
     return config.get(env, config['default'])
