@@ -7,7 +7,6 @@ import re
 from functools import wraps
 from werkzeug.security import generate_password_hash
 from config import get_config
-from database_config import get_database_url
 
 # Constantes globais para horários
 HORARIOS_PERMITIDOS = [
@@ -30,20 +29,7 @@ app = Flask(__name__)
 config = get_config()
 app.config.from_object(config)
 
-# FORÇA a configuração do banco para usar Neon PostgreSQL
-neon_url = get_database_url()
-app.config['SQLALCHEMY_DATABASE_URI'] = neon_url
 print(f"🔧 SQLALCHEMY_DATABASE_URI configurado: {app.config['SQLALCHEMY_DATABASE_URI']}")
-
-# Configurações específicas para PostgreSQL se estiver usando Neon
-if neon_url.startswith('postgresql+psycopg://'):
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        'connect_args': {
-            'connect_timeout': 10,
-            'application_name': 'gest-o-escolas'
-        }
-    }
-    print("✅ Configurações PostgreSQL aplicadas")
 
 # Inicializar banco de dados
 db.init_app(app)
