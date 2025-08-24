@@ -195,7 +195,7 @@ def reservas():
                 return redirect(url_for('reservas'))
             
             # Se for hoje, validar horário
-            if data == data_atual and datetime.strptime(request.form['horario_inicio'], '%H:%M').time() <= hora_atual:
+            if data == data_atual and datetime.strptime(request.form['horario_inicio'], '%H:%M').time() < hora_atual:
                 flash('Não é possível fazer reservas para horários passados!')
                 return redirect(url_for('reservas'))
             
@@ -208,7 +208,7 @@ def reservas():
             try:
                 horario_inicio = datetime.strptime(horario_inicio_str, '%H:%M').time()
                 horario_fim = datetime.strptime(horario_fim_str, '%H:%M').time()
-            except ValueError:
+            except ValueError as e:
                 flash('Formato de horário inválido!')
                 return redirect(url_for('reservas'))
             
@@ -237,8 +237,10 @@ def reservas():
                 horario_inicio=horario_inicio,
                 horario_fim=horario_fim
             )
+            
             db.session.add(nova_reserva)
             db.session.commit()
+            
             flash('Reserva realizada com sucesso!', 'success')
             return redirect(url_for('reservas'))
         return render_template('reservas.html', 
