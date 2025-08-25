@@ -33,12 +33,15 @@ class ProductionConfig(Config):
         psycopg_available = False
         print("⚠️ psycopg não disponível, usando SQLite")
     
-    print(f"🔍 Condições: DATABASE_URL={bool(DATABASE_URL)}, starts_with_postgres={DATABASE_URL.startswith('postgres://') if DATABASE_URL else False}, psycopg_available={psycopg_available}")
+    print(f"🔍 Condições: DATABASE_URL={bool(DATABASE_URL)}, starts_with_postgres={DATABASE_URL.startswith('postgres://') if DATABASE_URL else False}, starts_with_postgresql={DATABASE_URL.startswith('postgresql://') if DATABASE_URL else False}, psycopg_available={psycopg_available}")
     
-    if DATABASE_URL and DATABASE_URL.startswith('postgres://') and psycopg_available:
+    if DATABASE_URL and (DATABASE_URL.startswith('postgres://') or DATABASE_URL.startswith('postgresql://')) and psycopg_available:
         # Render usa postgres:// mas SQLAlchemy espera postgresql://
         # FORÇA o uso do dialeto psycopg (versão 3)
-        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+        if DATABASE_URL.startswith('postgres://'):
+            DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
+        elif DATABASE_URL.startswith('postgresql://'):
+            DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+psycopg://', 1)
         print(f"✅ URL do banco configurada: {DATABASE_URL}")
         
         # Configurações específicas para PostgreSQL com psycopg
