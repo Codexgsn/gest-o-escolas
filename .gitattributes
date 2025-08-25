@@ -1,0 +1,21 @@
+# Configuração automática de terminadores de linha
+* text=auto
+
+# Arquivos específicos
+*.py text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+
+# Arquivos binários
+*.db binary
+*.pyc binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
