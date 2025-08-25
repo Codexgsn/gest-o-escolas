@@ -29,7 +29,7 @@ app = Flask(__name__)
 config = get_config()
 app.config.from_object(config)
 
-print(f"🔧 SQLALCHEMY_DATABASE_URI configurado: {app.config['SQLALCHEMY_DATABASE_URI']}")
+
 
 # Inicializar banco de dados
 db.init_app(app)
@@ -201,7 +201,7 @@ def reservas():
                 flash('Não é possível fazer reservas para horários passados!')
                 return redirect(url_for('reservas'))
             
-            sala_id = request.form['sala_id']
+            sala_id = int(request.form['sala_id'])
             sala = Sala.query.get_or_404(sala_id)
             
             horario_inicio_str = request.form['horario_inicio']
@@ -416,8 +416,8 @@ def novo_usuario():
 @login_required
 @admin_required
 def admin_nova_reserva():
-    professor_id = request.form['professor_id']
-    sala_id = request.form['sala_id']
+    professor_id = int(request.form['professor_id'])
+    sala_id = int(request.form['sala_id'])
     data = datetime.strptime(request.form['data'], '%Y-%m-%d').date()
     horario_inicio = datetime.strptime(request.form['horario_inicio'], '%H:%M').time()
     horario_fim = datetime.strptime(request.form['horario_fim'], '%H:%M').time()
@@ -452,8 +452,8 @@ def admin_nova_reserva():
 def editar_reserva(reserva_id):
     reserva = Reserva.query.get_or_404(reserva_id)
     if request.method == 'POST':
-        reserva.professor_id = request.form['professor_id']
-        reserva.sala_id = request.form['sala_id']
+        reserva.professor_id = int(request.form['professor_id'])
+        reserva.sala_id = int(request.form['sala_id'])
         reserva.data = datetime.strptime(request.form['data'], '%Y-%m-%d').date()
         reserva.horario_inicio = datetime.strptime(request.form['horario_inicio'], '%H:%M').time()
         reserva.horario_fim = datetime.strptime(request.form['horario_fim'], '%H:%M').time()
