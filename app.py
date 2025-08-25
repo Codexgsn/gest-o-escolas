@@ -7,6 +7,7 @@ import re
 from functools import wraps
 from werkzeug.security import generate_password_hash
 from config import get_config
+from sqlalchemy import func, text
 
 # Constantes globais para horários
 HORARIOS_PERMITIDOS = [
@@ -29,8 +30,6 @@ app = Flask(__name__)
 config = get_config()
 app.config.from_object(config)
 
-
-
 # Inicializar banco de dados
 db.init_app(app)
 login_manager = LoginManager(app)
@@ -44,6 +43,24 @@ def inject_now():
 @login_manager.user_loader
 def load_user(user_id):
     return Usuario.query.get(int(user_id))
+
+def format_date_for_db(date_column, format_str='%Y-%m'):
+    """
+    Função auxiliar para formatar datas de forma compatível com SQLite e PostgreSQL
+    """
+    db_url = app.config['SQLALCHEMY_DATABASE_URI']
+    
+    if 'postgresql' in db_url or 'postgres' in db_url:
+        # PostgreSQL - usar to_char
+        if format_str == '%Y-%m':
+            return func.to_char(date_column, 'YYYY-MM')
+        elif format_str == '%Y-%m-%d':
+            return func.to_char(date_column, 'YYYY-MM-DD')
+        else:
+            return func.to_char(date_column, 'YYYY-MM')
+    else:
+        # SQLite - usar strftime
+        return func.strftime(format_str, date_column)
 
 @app.route('/')
 def index():
@@ -597,11 +614,11 @@ def dashboard():
     # Reservas por mês (últimos 6 meses)
     data_6_meses_atras = hoje - timedelta(days=180)
     reservas_por_mes = db.session.query(
-        func.strftime('%Y-%m', Reserva.data).label('mes'),
+        format_date_for_db(Reserva.data, '%Y-%m').label('mes'),
         func.count(Reserva.id).label('total')
     ).filter(
         Reserva.data >= data_6_meses_atras
-    ).group_by(func.strftime('%Y-%m', Reserva.data)).order_by('mes').all()
+    ).group_by(format_date_for_db(Reserva.data, '%Y-%m')).order_by('mes').all()
     
     # Top 5 salas com mais reservas hoje
     top_salas_hoje = db.session.query(
@@ -689,11 +706,11 @@ def dashboard_atualizar():
     # Reservas por mês (últimos 6 meses)
     data_6_meses_atras = hoje - timedelta(days=180)
     reservas_por_mes = db.session.query(
-        func.strftime('%Y-%m', Reserva.data).label('mes'),
+        format_date_for_db(Reserva.data, '%Y-%m').label('mes'),
         func.count(Reserva.id).label('total')
     ).filter(
         Reserva.data >= data_6_meses_atras
-    ).group_by(func.strftime('%Y-%m', Reserva.data)).order_by('mes').all()
+    ).group_by(format_date_for_db(Reserva.data, '%Y-%m')).order_by('mes').all()
     
     # Top 5 salas com mais reservas hoje
     top_salas_hoje = db.session.query(
