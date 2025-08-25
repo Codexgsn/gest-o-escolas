@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente do arquivo .env
+load_dotenv()
 
 class Config:
     """Configuração base da aplicação"""
@@ -19,7 +23,16 @@ class ProductionConfig(Config):
     # Configuração do banco para produção
     DATABASE_URL = os.environ.get('DATABASE_URL')
     
-    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+    # Verificar se psycopg está disponível
+    try:
+        import psycopg
+        psycopg_available = True
+        print("✅ psycopg disponível")
+    except ImportError:
+        psycopg_available = False
+        print("⚠️ psycopg não disponível, usando SQLite")
+    
+    if DATABASE_URL and DATABASE_URL.startswith('postgres://') and psycopg_available:
         # Render usa postgres:// mas SQLAlchemy espera postgresql://
         # FORÇA o uso do dialeto psycopg (versão 3)
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql+psycopg://', 1)
@@ -32,6 +45,11 @@ class ProductionConfig(Config):
                 'application_name': 'gest-o-escolas'
             }
         }
+    else:
+        # Usar SQLite se psycopg não estiver disponível
+        DATABASE_URL = None
+        SQLALCHEMY_ENGINE_OPTIONS = {}
+        print("⚠️ Usando SQLite (psycopg não disponível)")
     
     SQLALCHEMY_DATABASE_URI = DATABASE_URL or 'sqlite:///reserva_salas.db'
     print(f"SQLALCHEMY_DATABASE_URI final: {SQLALCHEMY_DATABASE_URI}")
