@@ -22,6 +22,7 @@ class ProductionConfig(Config):
     
     # Configuração do banco para produção
     DATABASE_URL = os.environ.get('DATABASE_URL')
+    print(f"🔍 DATABASE_URL do ambiente: {DATABASE_URL}")
     
     # Verificar se psycopg está disponível
     try:
@@ -31,6 +32,8 @@ class ProductionConfig(Config):
     except ImportError:
         psycopg_available = False
         print("⚠️ psycopg não disponível, usando SQLite")
+    
+    print(f"🔍 Condições: DATABASE_URL={bool(DATABASE_URL)}, starts_with_postgres={DATABASE_URL.startswith('postgres://') if DATABASE_URL else False}, psycopg_available={psycopg_available}")
     
     if DATABASE_URL and DATABASE_URL.startswith('postgres://') and psycopg_available:
         # Render usa postgres:// mas SQLAlchemy espera postgresql://
