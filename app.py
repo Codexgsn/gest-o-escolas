@@ -62,6 +62,24 @@ def format_date_for_db(date_column, format_str='%Y-%m'):
         # SQLite - usar strftime
         return func.strftime(format_str, date_column)
 
+def get_date_format_expression(date_column, format_str='%Y-%m'):
+    """
+    Retorna a expressão de formatação de data para usar em GROUP BY
+    """
+    db_url = app.config['SQLALCHEMY_DATABASE_URI']
+    
+    if 'postgresql' in db_url or 'postgres' in db_url:
+        # PostgreSQL - usar to_char
+        if format_str == '%Y-%m':
+            return func.to_char(date_column, 'YYYY-MM')
+        elif format_str == '%Y-%m-%d':
+            return func.to_char(date_column, 'YYYY-MM-DD')
+        else:
+            return func.to_char(date_column, 'YYYY-MM')
+    else:
+        # SQLite - usar strftime
+        return func.strftime(format_str, date_column)
+
 @app.route('/')
 def index():
     return render_template('index.html', now=datetime.now)
@@ -613,12 +631,13 @@ def dashboard():
     
     # Reservas por mês (últimos 6 meses)
     data_6_meses_atras = hoje - timedelta(days=180)
+    date_expr = get_date_format_expression(Reserva.data, '%Y-%m')
     reservas_por_mes = db.session.query(
-        format_date_for_db(Reserva.data, '%Y-%m').label('mes'),
+        date_expr.label('mes'),
         func.count(Reserva.id).label('total')
     ).filter(
         Reserva.data >= data_6_meses_atras
-    ).group_by(format_date_for_db(Reserva.data, '%Y-%m')).order_by('mes').all()
+    ).group_by(date_expr).order_by('mes').all()
     
     # Top 5 salas com mais reservas hoje
     top_salas_hoje = db.session.query(
@@ -705,12 +724,13 @@ def dashboard_atualizar():
     
     # Reservas por mês (últimos 6 meses)
     data_6_meses_atras = hoje - timedelta(days=180)
+    date_expr = get_date_format_expression(Reserva.data, '%Y-%m')
     reservas_por_mes = db.session.query(
-        format_date_for_db(Reserva.data, '%Y-%m').label('mes'),
+        date_expr.label('mes'),
         func.count(Reserva.id).label('total')
     ).filter(
         Reserva.data >= data_6_meses_atras
-    ).group_by(format_date_for_db(Reserva.data, '%Y-%m')).order_by('mes').all()
+    ).group_by(date_expr).order_by('mes').all()
     
     # Top 5 salas com mais reservas hoje
     top_salas_hoje = db.session.query(
